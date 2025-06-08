@@ -1,17 +1,12 @@
-"use client"
-
-import { Card } from "@/components/ui/card"
-import { Clock, Bell, Sparkles, Zap, Brain, Eye, Gamepad } from "lucide-react"
-import { useState } from "react"
+"use client";
+import { Card } from "@/components/ui/card";
 
 export function ComingSoonSection() {
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null)
-
   return (
     <section className="py-16 lg:py-24 relative overflow-hidden">
-        {/* <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1),transparent_70%)]" /> */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(59,130,246,0.1),transparent_50%)]" />
 
-        <div className="absolute inset-0 opacity-20">
+      <div className="absolute inset-0 opacity-20">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern
@@ -40,18 +35,21 @@ export function ComingSoonSection() {
           </h2>
 
           <p className="text-lg sm:text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed">
-            We're crafting revolutionary gaming experiences that push the boundaries of what's possible. Each game is
-            designed to challenge, entertain, and reward in ways never seen before.
+            We're crafting revolutionary gaming experiences that push the
+            boundaries of what's possible. Each game is designed to challenge,
+            entertain, and reward in ways never seen before.
           </p>
         </div>
 
-        {/* Newsletter Section */}
         <div className="max-w-2xl mx-auto">
           <Card className="bg-zinc-900/30 border-zinc-800/50 p-8 text-center backdrop-blur-sm">
             <div className="mb-6">
-              <h3 className="text-2xl lg:text-3xl font-bold mb-3">Stay Ahead of the Game</h3>
+              <h3 className="text-2xl lg:text-3xl font-bold mb-3">
+                Stay Ahead of the Game
+              </h3>
               <p className="text-zinc-400">
-                Join our exclusive community and be the first to experience these revolutionary games
+                Join our exclusive community and be the first to experience
+                these revolutionary games
               </p>
             </div>
 
@@ -69,5 +67,5 @@ export function ComingSoonSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
