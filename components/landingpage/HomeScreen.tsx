@@ -8,7 +8,6 @@ import {
   Sparkles,
   Zap,
   Trophy,
-  ArrowRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import WalletModal from "@/components/landingpage/WalletModal";
