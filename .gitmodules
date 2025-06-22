@@ -1,0 +1,3 @@
+[submodule "casinocontract/lib/forge-std"]
+	path = casinocontract/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
