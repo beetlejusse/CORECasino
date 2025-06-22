@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import Providers from "@/lib/provider";
+import { Analytics } from "@vercel/analytics/next";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -11,7 +12,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "CORECasino"
+  title: "CORECasino",
 };
 
 export default function RootLayout({
@@ -21,9 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={jakarta.variable}>
-        <body className="font-[var(--font-jakarta)] antialiased">
-          <Providers>{children}</Providers>
-        </body>
+      <body className="font-[var(--font-jakarta)] antialiased">
+        <Providers>
+          <Analytics />
+          {children}
+        </Providers>
+      </body>
     </html>
   );
 }
