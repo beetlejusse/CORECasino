@@ -34,24 +34,9 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
     mapping(uint256 => Game) public games;
     mapping(address => uint256[]) public playerGames;
 
-    event GameCreated(
-        uint256 indexed gameId,
-        address indexed player1,
-        uint256 bet,
-        uint256 timestamp
-    );
-    event PlayerJoined(
-        uint256 indexed gameId,
-        address indexed player2,
-        uint256 timestamp
-    );
-    event DiceRolled(
-        uint256 indexed gameId,
-        uint8 roll1,
-        uint8 roll2,
-        address winner,
-        uint256 payout
-    );
+    event GameCreated(uint256 indexed gameId, address indexed player1, uint256 bet, uint256 timestamp);
+    event PlayerJoined(uint256 indexed gameId, address indexed player2, uint256 timestamp);
+    event DiceRolled(uint256 indexed gameId, uint8 roll1, uint8 roll2, address winner, uint256 payout);
     event Payout(address indexed winner, uint256 amount);
     event GameCanceled(uint256 indexed gameId, address initiator);
     event TreasuryUpdated(address oldTreasury, address newTreasury);
@@ -71,10 +56,7 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
 
     modifier onlyGameParticipant(uint256 _gameId) {
         Game storage game = games[_gameId];
-        require(
-            msg.sender == game.player1 || msg.sender == game.player2,
-            "Not a game participant"
-        );
+        require(msg.sender == game.player1 || msg.sender == game.player2, "Not a game participant");
         _;
     }
 
@@ -128,17 +110,12 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
         gameId++;
     }
 
-    function joinGame(
-        uint256 _gameId
-    ) external payable validGame(_gameId) whenNotPaused nonReentrant {
+    function joinGame(uint256 _gameId) external payable validGame(_gameId) whenNotPaused nonReentrant {
         Game storage game = games[_gameId];
         require(game.state == GameState.WAITING, "Game not joinable");
         require(msg.value == game.betAmount, "Bet amount mismatch");
         require(msg.sender != game.player1, "Cannot join own game");
-        require(
-            block.number <= game.startBlock + MAX_BLOCK_DELAY,
-            "Game expired"
-        );
+        require(block.number <= game.startBlock + MAX_BLOCK_DELAY, "Game expired");
 
         game.player2 = payable(msg.sender);
         game.state = GameState.READY;
@@ -149,21 +126,10 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
         emit PlayerJoined(_gameId, msg.sender, block.timestamp);
     }
 
-    function rollDice(
-        uint256 _gameId
-    )
-        external
-        validGame(_gameId)
-        onlyGameParticipant(_gameId)
-        whenNotPaused
-        nonReentrant
-    {
+    function rollDice(uint256 _gameId) external validGame(_gameId) onlyGameParticipant(_gameId) whenNotPaused nonReentrant {
         Game storage game = games[_gameId];
         require(game.state == GameState.READY, "Game not ready");
-        require(
-            block.number <= game.startBlock + MAX_BLOCK_DELAY,
-            "Game expired"
-        );
+        require(block.number <= game.startBlock + MAX_BLOCK_DELAY, "Game expired");
 
         game.player1Roll = _generateRoll(game.player1, game.startBlock, 1);
         game.player2Roll = _generateRoll(game.player2, game.startBlock, 2);
@@ -171,18 +137,10 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
 
         uint256 payout = _determineWinner(_gameId);
 
-        emit DiceRolled(
-            _gameId,
-            game.player1Roll,
-            game.player2Roll,
-            game.winner,
-            payout
-        );
+        emit DiceRolled(_gameId, game.player1Roll, game.player2Roll, game.winner, payout);
     }
 
-    function cancelGame(
-        uint256 _gameId
-    ) external validGame(_gameId) nonReentrant {
+    function cancelGame(uint256 _gameId) external validGame(_gameId) nonReentrant {
         Game storage game = games[_gameId];
         require(game.state == GameState.WAITING, "Game cannot be canceled");
         require(msg.sender == game.player1, "Only creator can cancel");
@@ -193,18 +151,13 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
         emit GameCanceled(_gameId, msg.sender);
     }
 
-    function cancelExpiredGame(
-        uint256 _gameId
-    ) external validGame(_gameId) nonReentrant {
+    function cancelExpiredGame(uint256 _gameId) external validGame(_gameId) nonReentrant {
         Game storage game = games[_gameId];
         require(
             game.state == GameState.WAITING || game.state == GameState.READY,
             "Game cannot be canceled"
         );
-        require(
-            block.number > game.startBlock + MAX_BLOCK_DELAY,
-            "Game not expired yet"
-        );
+        require(block.number > game.startBlock + MAX_BLOCK_DELAY, "Game not expired yet");
 
         game.state = GameState.CANCELED;
 
@@ -219,11 +172,11 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
     }
 
     // Internal utility
-    function _generateRoll(
-        address player,
-        uint256 startBlock,
-        uint256 nonce
-    ) private view returns (uint8) {
+    function _generateRoll(address player, uint256 startBlock, uint256 nonce)
+        private
+        view
+        returns (uint8)
+    {
         bytes32 hash = keccak256(
             abi.encodePacked(
                 player,
@@ -265,9 +218,7 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
     }
 
     // View functions
-    function getGameDetails(
-        uint256 _gameId
-    )
+    function getGameDetails(uint256 _gameId)
         external
         view
         validGame(_gameId)
@@ -293,9 +244,7 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
         );
     }
 
-    function getPlayerGames(
-        address player
-    ) external view returns (uint256[] memory) {
+    function getPlayerGames(address player) external view returns (uint256[] memory) {
         return playerGames[player];
     }
 
@@ -304,10 +253,7 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
         uint256 count = 0;
 
         for (uint256 i = 0; i < gameId; i++) {
-            if (
-                games[i].state == GameState.WAITING ||
-                games[i].state == GameState.READY
-            ) {
+            if (games[i].state == GameState.WAITING || games[i].state == GameState.READY) {
                 activeGames[count++] = i;
             }
         }
@@ -320,9 +266,7 @@ contract DiceDuel is Ownable, ReentrancyGuard, Pausable {
         return result;
     }
 
-    function isGameExpired(
-        uint256 _gameId
-    ) external view validGame(_gameId) returns (bool) {
+    function isGameExpired(uint256 _gameId) external view validGame(_gameId) returns (bool) {
         return block.number > games[_gameId].startBlock + MAX_BLOCK_DELAY;
     }
 
